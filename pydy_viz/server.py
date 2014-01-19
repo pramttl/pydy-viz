@@ -5,7 +5,7 @@ import pydy_viz
 import sys
 class Server(threading.Thread):
     """
-    A basic Socket server.
+    A simple Socket server.
     This server is used for fetching
     static files from the pydy_viz
     source and rendering them to
@@ -45,9 +45,7 @@ class Server(threading.Thread):
 
         static_path = os.path.dirname(pydy_viz.__file__)
         static_path = os.path.join(static_path, 'static')
-        print "static path", static_path
         request = data.split(' ')[1]
-        print 'request:%s'% request
         if request == '/':
         #If requested to http://localhost:port/
         #Send index.html file
@@ -55,7 +53,6 @@ class Server(threading.Thread):
             send_buffer = ''
 
         elif request == '/data.json':
-            print 'data file requested'
         #If data.json is requested, get it from scene method
             file_path = os.path.join(os.getcwd(), self.saved_json_file)
             send_buffer = 'var JSONObj = '
@@ -66,14 +63,13 @@ class Server(threading.Thread):
             for val in file_path_list:
                 static_path = os.path.join(static_path, val)
             file_path = static_path
-            print "file path : " + file_path
             send_buffer = ''
 
         try:
             send_buffer += open(file_path).read()
-
         except IOError:
-            print '''404 File not found. Sent No Data'''
+            pass
+            #print '''404 File not found. Sent No Data'''
 
 
         return send_buffer
@@ -96,7 +92,6 @@ class Server(threading.Thread):
                 self.data = conn.recv(1024)
                 sent_data = self._parse_data(self.data)
                 conn.send(sent_data)
-                print 'sent data'
                 conn.close()
             except KeyboardInterrupt:        
                 print "Are you sure you want to shutdown[Y/N]?"
@@ -108,5 +103,5 @@ class Server(threading.Thread):
                     pass    
 
 if __name__ == "__main__":
-    a = Server()
-    a.run()
+    server = Server()
+    server.run()
